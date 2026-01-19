@@ -1,0 +1,110 @@
+<div class="dashboard">
+    <div class="dashboard-card number-card" style="background: linear-gradient(90deg,rgba(158, 158, 158, 0.33) 0%, var(--mat-sys-surface-container-low) 50%);">
+        <img src="assets/images/open-sign.png"/>
+
+        <div>
+            <span>{{ summary.open }}</span>
+            <span>Otwarte</span>
+        </div>
+    </div>
+
+    <div class="dashboard-card number-card" style="background: linear-gradient(90deg,rgba(255, 193, 7, 0.33) 0%, var(--mat-sys-surface-container-low) 50%);">
+        <img src="assets/images/work-in-progress.png"/>
+
+        <div>
+            <span>{{ summary.inProgress }}</span>
+            <span>W trakcie</span>
+        </div>
+    </div>
+
+    <div class="dashboard-card number-card" style="background: linear-gradient(90deg,rgba(34, 144, 255, 0.33) 0%, var(--mat-sys-surface-container-low) 50%);">
+        <img src="assets/images/client.png"/>
+
+        <div>
+            <span>{{ summary.waitingForCustomer }}</span>
+            <span>Oczkujące na klienta</span>
+        </div>
+    </div>
+
+    <div class="dashboard-card number-card" style="background: linear-gradient(90deg,rgba(121, 85, 72, 0.33) 0%, var(--mat-sys-surface-container-low) 50%);">
+        <img src="assets/images/onhold.png"/>
+
+        <div>
+            <span>{{ summary.onHold }}</span>
+            <span>Wstrzymane</span>
+        </div>
+    </div>
+
+    <div class="dashboard-card number-card" style="background: linear-gradient(90deg,rgba(3, 244, 27, 0.33) 0%, var(--mat-sys-surface-container-low) 50%);">
+        <img src="assets/images/checked-sign.png"/>
+
+        <div>
+            <span>{{ summary.resolved }}</span>
+            <span>Rozwiązane</span>
+        </div>
+    </div>
+
+    <div class="dashboard-card number-card" style="background: linear-gradient(90deg,rgba(158, 158, 158, 0.33) 0%, var(--mat-sys-surface-container-low) 50%);">
+        <img src="assets/images/closed.png"/>
+
+        <div>
+            <span>{{ summary.closed }}</span>
+            <span>Zamknięte</span>
+        </div>
+    </div>
+
+    <div class="dashboard-card grid-full">
+        <span class="card-header"><img src="assets/images/documents.png" alt="Icon"> Moje otwarte zgłoszenia</span>
+
+        <div class="open-tickets-container">
+            <table class="open-ticket-list">
+                <thead>
+                    <tr class="open-ticket-list-row">
+                        <th>Numer</th>
+                        <th>Tytuł</th>
+                        <th>Przypisany asystent</th>
+                        <th>Ostatnia aktualizacja</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (ticket of recentTickets; track ticket.uuid) {
+                        <tr class="open-ticket-list-row">
+                            <td>
+                                <a [routerLink]="['/ticket', ticket.uuid]">#{{ formatTicketId(ticket.id) }}</a>
+                            </td>
+                            <td>{{ ticket.name }}</td>
+                            <td>{{ ticket.assignedTo }}</td>
+                            <td>{{ ticket.lastUpdate | localDate }}</td>
+                            <td><app-status-badge [status]="ticket.status"></app-status-badge></td>
+                        </tr>
+                    } @empty {
+                        <tr class="open-ticket-list-row">
+                            <td colspan="5">Brak zgłoszeń</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (isUser) {
+        <a matRipple [routerLink]="['/create-ticket']" href="/create-ticket" class="dashboard-card button-card" style="grid-column: span 3;">
+            <img src="assets/images/new-ticket.png"/>
+
+            <div>
+                <span>Utwórz nowe zgłoszenie</span>
+                <span>Masz problem? Utwórz nowe zgłoszenie,<br/>a my Ci pomożemy!</span>
+            </div>
+        </a>
+
+        <a matRipple [routerLink]="['/tickets']" href="/tickets" class="dashboard-card button-card" style="grid-column: span 3;">
+            <img src="assets/images/folder.png"/>
+
+            <div>
+                <span>Wszystkie moje zgłoszenia</span>
+                <span>Zobacz wszystkie swoje zgłoszenia,<br/>te otwarte i zarchiwizowane</span>
+            </div>
+        </a>
+    }
+</div>
