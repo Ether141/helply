@@ -1,0 +1,28 @@
+﻿using Helply.MessagingContracts;
+using MassTransit;
+
+namespace Helply.Worker.Consumers;
+
+public sealed class TicketCommentAddedConsumer : IConsumer<TicketCommentAdded>
+{
+    private readonly ILogger<TicketCommentAddedConsumer> _logger;
+
+    public TicketCommentAddedConsumer(ILogger<TicketCommentAddedConsumer> logger) => _logger = logger;
+
+    public Task Consume(ConsumeContext<TicketCommentAdded> context)
+    {
+        var m = context.Message;
+
+        _logger.LogInformation("ticket_comment_added: {TicketId} at {At}", m.TicketId, m.AddedAt);
+
+        context.Publish(new TicketNotification()
+        {
+            NotificationId = Guid.NewGuid(),
+            UserId = m.UserId,
+            TicketId = m.TicketId,
+            Type = 1
+        }, context.CancellationToken);
+
+        return Task.CompletedTask;
+    }
+}
