@@ -1,0 +1,56 @@
+<h2 class="header">Utwórz konto</h2>
+<form [formGroup]="form" (ngSubmit)="submit()" class="form">
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Imię</mat-label>
+    <input matInput type="text" formControlName="firstName" />
+      @if (firstNameControl?.hasError('required') && (firstNameControl?.touched || firstNameControl?.dirty)) {<mat-error>Imię jest wymagane</mat-error>}
+      @if (firstNameControl?.hasError('minlength') && (firstNameControl?.touched || firstNameControl?.dirty)) {<mat-error>Imię musi mieć co najmniej 3 znaki</mat-error>}
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Nazwisko</mat-label>
+    <input matInput type="text" formControlName="lastName" />
+      @if (lastNameControl?.hasError('required') && (lastNameControl?.touched || lastNameControl?.dirty)) {<mat-error>Nazwisko jest wymagane</mat-error>}
+      @if (lastNameControl?.hasError('minlength') && (lastNameControl?.touched || lastNameControl?.dirty)) {<mat-error>Nazwisko musi mieć co najmniej 3 znaki</mat-error>}
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Email</mat-label>
+    <input matInput type="email" formControlName="email" />
+      @if (emailControl?.hasError('required') && (emailControl?.touched || emailControl?.dirty)) {<mat-error>Email jest wymagany</mat-error>}
+      @if (emailControl?.hasError('email') && (emailControl?.touched || emailControl?.dirty)) {<mat-error>Podaj poprawny adres email</mat-error>}
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Hasło</mat-label>
+    <input matInput type="password" formControlName="password" />
+      @if (passwordControl?.hasError('required') && (passwordControl?.touched || passwordControl?.dirty)) {<mat-error>Hasło jest wymagane</mat-error>}
+      @if (passwordControl?.hasError('pattern') && (passwordControl?.touched || passwordControl?.dirty)) {<mat-error>Hasło musi mieć min. 8 znaków, zawierać dużą literę i cyfrę</mat-error>}
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Powtórz hasło</mat-label>
+    <input matInput type="password" formControlName="confirmPassword" />
+      @if (confirmPasswordControl?.hasError('required') && (confirmPasswordControl?.touched || confirmPasswordControl?.dirty)) {<mat-error>Potwierdzenie hasła jest wymagane</mat-error>}
+      @if (confirmPasswordControl?.hasError('passwordMismatch') && (confirmPasswordControl?.touched || confirmPasswordControl?.dirty)) {<mat-error>Hasła nie są zgodne</mat-error>}
+  </mat-form-field>
+
+  @if (!isRegistering) {
+   <div class="action-buttons">
+      <button class="auth-button" mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Zarejestruj się</button>
+      <button class="auth-button" mat-button routerLink="/auth/login" type="button">Masz konto? Zaloguj się</button>
+   </div>
+  }
+
+  @if (isRegistering) {
+    <div class="spinner">
+      <mat-progress-spinner diameter="60" mode="indeterminate"></mat-progress-spinner>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="error">
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
+</form>
