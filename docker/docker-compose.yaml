@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: postgres/Dockerfile
     image: helply-postgres:16
-    container_name: postgres
+    container_name: helply-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: appuser
@@ -69,7 +69,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: pgadmin
+    container_name: helply-pgadmin
     profiles:
       - dev
     restart: unless-stopped
@@ -83,7 +83,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
+    container_name: helply-rabbitmq
     restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: rabbitmq
