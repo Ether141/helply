@@ -1,0 +1,46 @@
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.table-container {
+    width: 100%;
+    max-width: 1200px;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+}
+
+table tr {
+    height: 40px;
+}
+
+table tr:nth-child(even),
+table thead tr,
+.mat-mdc-header-row {
+    background-color: var(--mat-sys-surface-container-low);
+}
+
+.mat-mdc-form-field {
+    font-size: 14px;
+    width: 100%;
+}
+
+.mat-mdc-row,
+.mat-mdc-header-row,
+.mat-mdc-cell,
+.mat-mdc-header-cell {
+    border-bottom: none !important;
+}
+
+.mat-mdc-row, .mat-mdc-cell {
+    transition: background-color 0.15s ease;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
+  background-color: var(--mat-sys-surface-container-highest);
+  cursor: pointer;
+}

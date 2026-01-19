@@ -1,0 +1,43 @@
+<div class="main-container">
+    <h2>Moje zgłoszenia</h2>
+
+    <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort>
+
+            <!-- ID Column -->
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Numer </th>
+                <td mat-cell *matCellDef="let row"><b>#{{ formatTicketId(row.id) }}</b></td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Tytuł </th>
+                <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+            </ng-container>
+
+            <!-- Assigned To Column -->
+            <ng-container matColumnDef="assignedTo">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Przypisany asystent </th>
+                <td mat-cell *matCellDef="let row"> {{row.assignedTo}} </td>
+            </ng-container>
+
+            <!-- Last Update Column -->
+            <ng-container matColumnDef="lastUpdate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Ostatnia aktualizacja </th>
+                <td mat-cell *matCellDef="let row"> {{ row.lastUpdate | localDate }} </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                <td mat-cell *matCellDef="let row"> <app-status-badge [status]="row.status"></app-status-badge> </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="openTicket(row)"></tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[10, 25, 100]" aria-label="Wybierz ile rekordów na stronie"></mat-paginator>
+    </div>
+</div>
