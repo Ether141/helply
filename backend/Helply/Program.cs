@@ -1,0 +1,159 @@
+using Helply.Auth;
+using Helply.Consumers;
+using Helply.Files;
+using Helply.Hubs;
+using Helply.MessagingContracts;
+using Helply.Models.Db;
+using Helply.Repository;
+using Helply.SignalR;
+using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+
+namespace Helply;
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddControllers();
+
+        builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+
+        builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+
+        builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+        builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+        builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
+        builder.Services.AddSingleton<IFileManager, FileManager>();
+
+        var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
+
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+        builder.Services
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.MapInboundClaims = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
+                    ClockSkew = TimeSpan.Zero,
+                    NameClaimType = JwtRegisteredClaimNames.Sub,
+                    RoleClaimType = System.Security.Claims.ClaimTypes.Role
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/hubs/notifications")))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+        builder.Services.AddAuthorization();
+
+        builder.Services.AddSignalR(o =>
+        {
+            o.KeepAliveInterval = TimeSpan.FromSeconds(15);
+            o.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+        });
+
+        builder.Services.AddOptions<RabbitMqTransportOptions>().BindConfiguration(nameof(RabbitMqTransportOptions));
+
+        builder.Services.AddMassTransit(x =>
+        {
+            x.AddConsumers(typeof(Program).Assembly);
+
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                var opt = context.GetRequiredService<IOptions<RabbitMqTransportOptions>>().Value;
+
+                cfg.Host(opt.Host, opt.Port, opt.VHost, h =>
+                {
+                    h.Username(opt.User);
+                    h.Password(opt.Pass);
+                });
+
+                cfg.Message<TicketStatusChanged>(m => m.SetEntityName("ticket_status_changed"));
+                cfg.Message<TicketCommentAdded>(m => m.SetEntityName("ticket_comment_added"));
+                cfg.Message<TicketAssigned>(m => m.SetEntityName("ticket_assigned"));
+                cfg.Message<TicketNotification>(m => m.SetEntityName("ticket_notification_created"));
+
+                cfg.ReceiveEndpoint("ticket_notification_created.worker", e =>
+                {
+                    e.ConfigureConsumer<TicketNotificationConsumer>(context);
+                    e.UseMessageRetry(r => r.Immediate(5));
+                });
+            });
+        });
+
+        Log.Logger = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .WriteTo.Seq(builder.Configuration["Serilog:SeqUrl"]!)
+            .CreateLogger();
+
+        builder.Services.AddSerilog();
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("spa", policy =>
+            {
+                policy.WithOrigins("http://localhost:4200")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
+            });
+        });
+
+        var app = builder.Build();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
+        app.UseCors("spa");
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapControllers();
+        app.MapHub<NotificationsHub>("/hubs/notifications");
+
+        app.Run();
+    }
+}

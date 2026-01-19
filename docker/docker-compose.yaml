@@ -1,0 +1,121 @@
+version: "3.9"
+
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: postgres/Dockerfile
+    image: helply-postgres:16
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppassword
+      POSTGRES_DB: appdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Helply/Dockerfile
+    container_name: helply-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=appdb;Username=appuser;Password=apppassword
+      Serilog__SeqUrl: http://seq:5341
+      RabbitMqTransportOptions__Host: rabbitmq
+      RabbitMqTransportOptions__Port: 5672
+      RabbitMqTransportOptions__VHost: /
+      RabbitMqTransportOptions__User: rabbitmq
+      RabbitMqTransportOptions__Pass: rabbitmq
+    ports:
+      - "5202:8080"
+
+  worker:
+    build:
+      context: ../backend
+      dockerfile: Helply.Worker/Dockerfile
+    container_name: helply-worker
+    restart: unless-stopped
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      RabbitMqTransportOptions__Host: rabbitmq
+      RabbitMqTransportOptions__Port: 5672
+      RabbitMqTransportOptions__VHost: /
+      RabbitMqTransportOptions__User: rabbitmq
+      RabbitMqTransportOptions__Pass: rabbitmq
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: helply-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    profiles:
+      - dev
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - postgres
+    ports:
+      - "5050:80"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # UI
+
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    profiles:
+      - dev
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
+    ports:
+      - "8081:80"    # UI
+      - "5341:5341"  # ingestion
+    volumes:
+      - seq-data:/data
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  seq-data:
