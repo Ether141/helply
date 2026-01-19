@@ -1,0 +1,49 @@
+@use '@angular/material' as mat;
+@use '_theme-colors' as mycolors;
+
+:root {
+  @include mat.theme((
+    color: (
+      theme-type: light,
+      primary: mycolors.$primary-palette,
+      secondary: mycolors.$primary-palette,
+      tertiary: mycolors.$tertiary-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+
+  --mat-sys-primary: #fca84c;
+  --mat-sys-on-primary: #1b1b1b;
+  --mat-sys-success: #388e3c;
+  --mat-sys-on-success: #ffffff;
+}
+
+:root[data-theme='dark'] {
+  @include mat.theme((
+    color: (
+      theme-type: dark,
+      primary: mycolors.$primary-palette,
+      secondary: mycolors.$primary-palette,
+      tertiary: mycolors.$tertiary-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+
+  --mat-sys-primary: #fca84c;
+  --mat-sys-on-primary: #1b1b1b;
+  --mat-sys-success: #81c784;
+  --mat-sys-on-success: #1b1b1b;
+}
+
+.snackbar-success {
+  @include mat.snack-bar-overrides((
+    container-color: var(--mat-sys-success),
+    supporting-text-color: var(--mat-sys-on-success),
+    button-color: var(--mat-sys-on-success)
+  ));
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", Arial, sans-serif; }
