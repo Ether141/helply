@@ -1,0 +1,33 @@
+<div class="sheet">
+  <span class="sheet__title">Opcje zgłoszenia</span>
+
+  <div class="sheet__fields">
+    <mat-form-field appearance="fill" class="sheet__field">
+      <mat-label>Priorytet</mat-label>
+      <mat-select [formControl]="priorityCtrl">
+        <mat-option *ngFor="let p of priorities" [value]="p.value">
+          {{ p.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="sheet__field">
+      <mat-label>Status</mat-label>
+      <mat-select [formControl]="statusCtrl">
+        <mat-option *ngFor="let s of statuses" [value]="s.value">
+          {{ s.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="sheet__actions">
+    @if((user$ | async)?.role === 'Assistant') {
+        <button mat-stroked-button type="button" class="sheet__assign" (click)="assignToMe()">
+        Przypisz do mnie
+        </button>
+    }
+    <button mat-button type="button" (click)="cancel()">Anuluj</button>
+    <button mat-raised-button color="primary" type="button" (click)="save()">Zapisz</button>
+  </div>
+</div>

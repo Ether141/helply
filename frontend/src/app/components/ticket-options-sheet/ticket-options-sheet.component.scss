@@ -1,0 +1,31 @@
+.sheet {
+    padding: 16px;
+}
+
+.sheet__title {
+    display: block;
+    margin: 0 16px 20px 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.sheet__fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.sheet__field {
+    width: 100%;
+}
+
+.sheet__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.sheet__assign {
+    margin-right: auto;
+}
