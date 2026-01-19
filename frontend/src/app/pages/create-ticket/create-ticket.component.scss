@@ -1,0 +1,27 @@
+.main-form {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-form > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+h2 {
+    margin-bottom: 40px;
+    font-weight: 600;
+    text-align: center;
+}

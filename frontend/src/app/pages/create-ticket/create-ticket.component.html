@@ -1,0 +1,45 @@
+<form class="main-form" [formGroup]="ticketForm" (ngSubmit)="onSubmit()">
+    <h2>Utwórz nowe zgłoszenie</h2>
+
+    <div>
+        <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+            <mat-label>Tytuł</mat-label>
+            <input matInput formControlName="title" placeholder="Krótki opis problemu" maxlength="100" required />
+            <mat-hint align="end">{{ ticketForm.get('title')?.value?.length || 0 }}/100</mat-hint>
+            @if (ticketForm.get('title')?.hasError('required') && (ticketForm.get('title')?.touched || ticketForm.get('title')?.dirty)) {<mat-error>Tytuł jest wymagany</mat-error>}
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Kategoria</mat-label>
+            <mat-select formControlName="category" required>
+                @for (cat of categories; track cat.id) {
+                    <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
+                }
+            </mat-select>
+            @if (ticketForm.get('category')?.hasError('required') && (ticketForm.get('category')?.touched || ticketForm.get('category')?.dirty)) {<mat-error>Kategoria jest wymagana</mat-error>}
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Priorytet</mat-label>
+            <mat-select formControlName="priority" required>
+                <mat-option [value]="0">Niski</mat-option>
+                <mat-option [value]="1">Normalny</mat-option>
+                <mat-option [value]="2">Wysoki</mat-option>
+                <mat-option [value]="3">Pilny</mat-option>
+            </mat-select>
+            @if (ticketForm.get('priority')?.hasError('required') && (ticketForm.get('priority')?.touched || ticketForm.get('priority')?.dirty)) {<mat-error>Priorytet jest wymagany</mat-error>}
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Opis</mat-label>
+            <textarea matInput formControlName="description" rows="6" placeholder="Szczegółowy opis problemu" required></textarea>
+            @if (ticketForm.get('description')?.hasError('required') && (ticketForm.get('description')?.touched || ticketForm.get('description')?.dirty)) {<mat-error>Opis jest wymagany</mat-error>}
+            @if (ticketForm.get('description')?.hasError('minlength') && (ticketForm.get('description')?.touched || ticketForm.get('description')?.dirty)) {<mat-error>Opis jest zbyt krótki</mat-error>}
+        </mat-form-field>
+
+        <div class="actions">
+            <button mat-stroked-button type="button" (click)="ticketForm.reset()">Wyczyść</button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="ticketForm.invalid">Utwórz zgłoszenie</button>
+        </div>
+    </div>
+</form>
