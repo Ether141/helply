@@ -1,0 +1,32 @@
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.status-badge.is-open {
+    background-color: #8f8f8f;
+}
+
+.status-badge.is-in-progress {
+    background-color: #f2c94c;
+}
+
+.status-badge.is-waiting {
+    background-color: #518ae0;
+}
+
+.status-badge.is-on-hold {
+    background-color: #eb5757;
+}
+
+.status-badge.is-resolved {
+    background-color: #27ae60;
+}
+
+.status-badge.is-closed {
+    background-color: #707070;
+}
