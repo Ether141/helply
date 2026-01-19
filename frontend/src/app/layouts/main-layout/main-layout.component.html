@@ -1,0 +1,65 @@
+<div class="app-shell" [class.sidenav-collapsed]="isSidenavCollapsed">
+  <mat-toolbar class="topbar">
+    <button class="menu-button" mat-icon-button (click)="toggleNav()" aria-label="Switch menu">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <mat-icon svgIcon="app-logo" class="app-logo" aria-label="Helply logo"></mat-icon>
+    <span class="spacer"></span>
+    <app-theme-switcher/>
+    <button class="menu-button" mat-icon-button aria-label="Powiadomienia" matTooltip="Powiadomiena" matTooltipShowDelay="500" [matMenuTriggerFor]="notificationsMenu" [matBadge]="notifications.length" [matBadgeHidden]="notifications.length === 0">
+      <mat-icon>notifications</mat-icon>
+    </button>
+    <button class="menu-button" mat-icon-button aria-label="Account" matTooltip="Moje konto" matTooltipShowDelay="500" [matMenuTriggerFor]="menu">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <mat-sidenav-container #sidenavContainer class="app-content" autosize> 
+    <mat-sidenav
+      #sidenav
+      [mode]="isMobile ? 'over' : 'side'"
+      [opened]="isMobile ? isSidenavOpen : true"
+      (closedStart)="isSidenavOpen = false">
+      <nav class="nav">
+        <app-sidenav-button [mini]="isSidenavCollapsed" label="Dashboard" icon="dashboard" link="dashboard"/>
+        <app-sidenav-button *ngIf="canCreateTicket" [mini]="isSidenavCollapsed" label="Utwórz zgłoszenie" icon="add_circle" link="create-ticket"/>
+        <app-sidenav-button [mini]="isSidenavCollapsed" [label]="ticketsLabel" icon="folder" link="tickets"/>
+      </nav>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      <div class="page-content">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
+
+<mat-menu #menu="matMenu">
+  <div class="menu-header">
+    <span>{{ this.username }}</span>
+  </div>
+  <button mat-menu-item (click)="logout();">
+    <mat-icon>logout</mat-icon>
+    <span>Wyloguj się</span>
+  </button>
+</mat-menu>
+
+<mat-menu #notificationsMenu="matMenu">
+  <div class="menu-header">
+    <span>Powiadomienia</span>
+  </div>
+
+  @if (notifications.length > 0) {
+    @for (notification of notifications; track notification.notificationId) {
+      <button mat-menu-item class="notification-button" (click)="onNotificationClick(notification)">
+        <span class="notification-header">#{{ notification.ticketSlug }} <span class="notification-date">{{ notification.createdAt | localDate }}</span></span><br>
+        <span class="notification-message">{{ notification.message }}</span>
+      </button>
+    }
+  } @else {
+    <button mat-menu-item disabled>
+      <span>Brak nowych powiadomień</span>
+    </button>
+  }
+</mat-menu>

@@ -1,0 +1,131 @@
+$sidenav-width-expanded: 260px;
+$sidenav-width-collapsed: 74px;
+$topbar-height: 64px;
+$navigation-color: var(--mat-sys-surface-container);
+$navigation-shadow: 0px 0px 10px -1px rgba(66, 68, 90, 1);
+
+:host {
+  display: block;
+  height: 100dvh;
+}
+
+mat-sidenav {
+  width: $sidenav-width-expanded;
+  transition: width 0.2s ease-in !important;
+
+  border-right: none;
+  border-radius: 0;
+
+  position: fixed;
+  top: 64px;
+  background-color: $navigation-color;
+}
+
+.sidenav-content {
+  margin-left: $sidenav-width-expanded !important;
+}
+
+.sidenav-collapsed {
+  mat-sidenav {
+    width: $sidenav-width-collapsed;
+  }
+
+  .sidenav-content {
+    margin-left: $sidenav-width-collapsed !important;
+  }
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout-container {
+  height: 100%;
+}
+
+.topbar {
+  height: $topbar-height;
+  padding: 15px;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  overflow: visible;
+  letter-spacing: -1px;
+  font-weight: 500;
+  background-color: $navigation-color;
+
+  .menu-button {
+    width: 44px;
+  }
+}
+
+@media (max-width: 750px) {
+  .topbar::after {
+    left: 0;
+    transition: none;
+  }
+}
+
+.page-content {
+  padding: 24px;
+
+  @media (max-width: 800px) {
+    padding: 16px;
+  }
+
+  @media (max-width: 600px) {
+    padding: 8px;
+  }
+}
+
+.app-content {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 15px 15px 15px;
+  gap: 5px;
+}
+
+.label {
+  white-space: nowrap;
+  transition: opacity 0.15s ease, widh 0.15s ease;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.app-logo {
+  margin-left: 25px;
+  width: 120px;
+  height: 40px;
+}
+
+.menu-header {
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.notification-header {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.notification-message {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.notification-date {
+  font-size: 0.7rem;
+  font-weight: normal;
+  opacity: 0.6;
+}
