@@ -1,0 +1,53 @@
+a {
+    text-decoration: none;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface);
+}
+
+div {
+    display: flex;
+    container-type: inline-size;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+    flex-wrap: nowrap;
+    padding: 10px;
+    border-radius: 10px;
+    transition: background-color 0.2s ease-in-out;
+
+    mat-icon {
+        flex: 0 0 auto;
+        min-width: 0;
+    }
+
+    span {
+        white-space: pre;
+        flex: 0 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        transition: opacity 0.4s ease;
+        background-color: transparent;
+        opacity: 1;
+    }
+
+    &.mini {
+        span {
+            opacity: 0;
+        }
+    }
+}
+
+a.active-link {
+    font-weight: bold;
+
+    div {
+        background-color: var(--mat-sys-primary-container);
+    }
+}
+
+a:hover:not(.active-link) {
+    div {
+        background-color: color-mix(in srgb, var(--mat-sys-primary-container) 85%, white 25%);
+    }
+}

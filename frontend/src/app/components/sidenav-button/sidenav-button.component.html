@@ -1,0 +1,8 @@
+<a #root mat-list-item [routerLink]="link" routerLinkActive="active-link" [ariaLabel]="label" [matTooltip]="label" matTooltipPosition="right" [matTooltipDisabled]="!mini">
+    <div matRipple [matRippleRadius]="mini ? 40 : 120" [class.mini]="mini">
+        @if (this.icon.length > 0) {
+            <mat-icon class="icon">{{ icon }}</mat-icon>
+        }
+        <span>{{ label }}</span>
+    </div>
+</a>
