@@ -1,0 +1,31 @@
+<h2 class="header">Zaloguj się</h2>
+<form [formGroup]="form" (ngSubmit)="submit()" class="form">
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Email</mat-label>
+    <input matInput type="email" formControlName="email" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Hasło</mat-label>
+    <input matInput type="password" formControlName="password" />
+  </mat-form-field>
+
+@if (!isLoggingIn) {
+  <div class="action-buttons">
+    <button class="auth-button" mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Zaloguj się</button>
+    <button class="auth-button" mat-button routerLink="/auth/register" type="button">Utwórz konto</button>
+  </div>
+}
+
+@if (isLoggingIn) {
+  <div class="spinner">
+    <mat-progress-spinner diameter="60" mode="indeterminate"></mat-progress-spinner>
+  </div>
+}
+
+@if (errorMessage) {
+  <div class="error">
+    <span><mat-icon>error</mat-icon> {{ errorMessage }}</span>
+  </div>
+}
+</form>

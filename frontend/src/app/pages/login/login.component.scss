@@ -1,0 +1,38 @@
+.header {
+    margin: 0 auto 30px auto;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface, #000);
+}
+
+mat-form-field {
+    width: 80%;
+}
+
+.auth-button {
+    width: 70%;
+    margin-top: 12px;
+}
+
+.action-buttons {
+    height: 120px;
+}
+
+.spinner {
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.error {
+    color: var(--mat-sys-error);
+    margin-top: 12px;
+}
+
+.error > span {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
