@@ -1,0 +1,179 @@
+@if (ticket$ | async; as ticket) {
+<div class="ticket-container">
+    <div>
+        <div class="header">
+            <div class="main-header">
+                <span class="ticket-id">#{{ formatTicketSlug(ticket.slug) }}</span>
+                <span class="ticket-title">{{ ticket.title }}</span>
+                <span class="ticket-category">{{ ticket.categoryName }}</span>
+                <span class="ticket-priority">
+                    <div class="priority-div" [ngClass]="priorityDotClass(ticket.priority)"></div>{{
+                    priorityLabel(ticket.priority) }}
+                </span>
+            </div>
+
+            <div class="additional-header">
+                <div>
+                    <app-status-badge [status]="ticket.status"></app-status-badge>
+                    @if (isAssistant$ | async) {
+                    <button mat-icon-button aria-label="Opcje zgłoszenia" (click)="openBottomSheet(ticket)">
+                        <mat-icon>settings</mat-icon>
+                    </button>
+                    }
+                </div>
+                <span><span style="opacity: 0.7;">Utworzone:</span>&nbsp;<strong>{{ ticket.createdAt | localDate
+                        }}</strong></span>
+                <span><span style="opacity: 0.7;">Aktualizacja:</span>&nbsp;<strong>{{ ticket.updatedAt | localDate
+                        }}</strong></span>
+                <span><span style="opacity: 0.7;">Utworzony przez:</span>&nbsp;<strong>{{ ticket.authorName
+                        }}</strong></span>
+                <span><span style="opacity: 0.7;">Przypisany do:</span>&nbsp;<strong>{{ ticket.assistantName || '—'
+                        }}</strong></span>
+            </div>
+        </div>
+
+        <div class="description">
+            <h4>Opis problemu</h4>
+            <p>{{ ticket.description }}</p>
+        </div>
+
+        <div class="attachments">
+            <h4>Załączniki</h4>
+            <div class="attachments-list">
+                @if (attachments$ | async; as attachments) {
+                @for (attachment of attachments; track attachment.id) {
+                <div class="attachment-item" (click)="downloadAttachment(attachment)">
+                    <span>{{ attachment.fileName }}</span>
+                    <button mat-icon-button aria-label="Pobierz załącznik"
+                        (click)="$event.stopPropagation(); downloadAttachment(attachment)">
+                        <mat-icon>download</mat-icon>
+                    </button>
+
+                    <button mat-icon-button aria-label="Usuń załącznik"
+                        (click)="$event.stopPropagation(); confirmDeleteAttachment(attachment, deleteAttachmentDialog)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+                }
+                }
+            </div>
+
+            <ng-template #deleteAttachmentDialog let-data let-dialogRef="dialogRef">
+                <h2 mat-dialog-title>Usunąć załącznik?</h2>
+                <div mat-dialog-content>
+                    Czy na pewno chcesz usunąć: <strong>{{ data.fileName }}</strong>?
+                </div>
+                <div mat-dialog-actions>
+                    <button mat-button type="button" (click)="dialogRef.close(false)">Anuluj</button>
+                    <button mat-flat-button color="warn" type="button" (click)="dialogRef.close(true)">Usuń</button>
+                </div>
+            </ng-template>
+
+            @if (ticket.status !== 5) {
+                <div class="upload-row">
+                    <input
+                        #attachmentInput
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+                        (change)="onAttachmentSelected($event)" />
+                    <button mat-flat-button color="primary" type="button"
+                        (click)="uploadAttachment(ticket.id, attachmentInput)"
+                        [disabled]="!selectedAttachment || isUploadingAttachment">
+                        {{ isUploadingAttachment ? 'Wysyłanie...' : 'Wyślij plik' }}
+                    </button>
+                </div>
+
+                @if (selectedAttachment) {
+                    <div class="selected-file">Wybrano: <strong>{{ selectedAttachment.name }}</strong></div>
+                }
+            }
+        </div>
+
+        <div class="comments">
+            <span class="comments-header">Komentarze do zgłoszenia</span>
+
+            @if (comments$ | async; as comments) {
+            @if (comments.length) {
+            @for (comment of comments; track trackComment($index, comment)) {
+                <div class="comment" [ngClass]="comment.isOwnerComment ? 'owner-comment' : 'system-comment'">
+                    <div class="comment-header">
+                        @if (comment.isOwnerComment) {
+                            <div>
+                                <mat-icon>person</mat-icon>
+                                <span class="comment-author">{{ comment.authorName }}</span>
+                            </div>
+                            <span class="comment-date">{{ comment.createdAt | localDate }}</span>
+                        } @else {
+                            <span class="comment-date">{{ comment.createdAt | localDate }}</span>
+                            <div>
+                                <mat-icon>person</mat-icon>
+                                <span class="comment-author">{{ comment.authorName }}</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div>
+                        @for (part of comment.contentParts; track trackCommentContentPart($index, part)) {
+                            @if (part.kind === 'text') {
+                                {{ part.text }}
+                            }
+                            @if (part.kind === 'attachment') {
+                                @if (isAttachmentAvailable(part.id)) {
+                                    <span class="attachment-link" (click)="downloadAttachmentReference(part.id, part.fileName)">{{ part.fileName }}</span>
+                                } @else {
+                                    <span class="attachment-deleted">Usunięty</span>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            } @else {
+            <div class="no-comments">Brak komentarzy</div>
+            }
+            }
+
+            @if (ticket.status !== 5) {
+            <form class="comment-input" [formGroup]="commentForm" #commentFormDir="ngForm"
+                (ngSubmit)="onCommentSubmit(commentFormDir)">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Dodaj komentarz</mat-label>
+                    <textarea #commentTextarea matInput rows="4" placeholder="Napisz coś..." formControlName="content"
+                        (input)="onCommentTextareaEvent(commentTextarea)"
+                        (keyup)="onCommentTextareaEvent(commentTextarea)"
+                        (keydown)="onCommentTextareaKeydown($event, commentTextarea)"
+                        (click)="onCommentTextareaEvent(commentTextarea)"
+                        (scroll)="onCommentTextareaEvent(commentTextarea)" (blur)="onCommentTextareaBlur()"></textarea>
+                </mat-form-field>
+
+                @if (isAttachmentSuggestOpen) {
+                <div class="attachment-suggest" [style.top.px]="attachmentSuggestTop"
+                    [style.left.px]="attachmentSuggestLeft">
+                    @if (attachmentSuggestions.length) {
+                    @for (attachment of attachmentSuggestions; track attachment.id) {
+                    <div class="attachment-suggest-item">{{ attachment.fileName }}</div>
+                    }
+                    } @else {
+                    <div class="attachment-suggest-empty">Brak pasujących załączników</div>
+                    }
+                </div>
+                }
+                <div class="actions">
+                    <button mat-flat-button color="primary" type="submit"
+                        [disabled]="commentForm.invalid || isSubmittingComment">
+                        Dodaj komentarz
+                    </button>
+                </div>
+            </form>
+            } @else {
+            <div class="ticket-closed-info">
+                <div>
+                    <mat-icon>info</mat-icon>
+                    <span>Zgłoszenie zostało zamknięte. Dodawanie komentarzy jest wyłączone.</span>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+}

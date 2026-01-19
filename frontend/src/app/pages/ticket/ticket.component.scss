@@ -1,0 +1,346 @@
+.ticket-container {
+    width: 100%;
+    max-width: 1000px;
+    margin-inline: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ticket-container > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    @media (max-width: 1150px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 30px;
+        padding: 10px;
+    }
+}
+
+.main-header, .additional-header {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-header {
+    gap: 6px;
+}
+
+.additional-header {
+    align-items: flex-end;
+    gap: 5px;
+
+    div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    @media (max-width: 1150px) {
+        align-items: flex-start;
+    }
+}
+
+.ticket-category {
+    margin-top: 8px;
+    opacity: 0.8;
+}
+
+.ticket-id {
+    font-size: 0.9rem;
+    font-weight: 500;
+    width: 50px;
+    text-align: center;
+    padding: 4px 12px;
+    border-radius: 5px;
+    background-color: var(--mat-sys-surface-container-highest);
+    margin-bottom: 5px;
+}
+
+.ticket-title {
+    font-size: 1.55rem;
+    font-weight: 500;
+
+    @media (max-width: 900px) {
+        font-size: 1.2rem;
+    }
+}
+
+.priority-div {
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.priority-low {
+    background-color: #4caf50;
+}
+
+.priority-medium {
+    background-color: #ff9800;
+}
+
+.priority-high {
+    background-color: #f44336;
+}
+
+.priority-urgent {
+    background-color: #b71c1c;
+}
+
+.description {
+    margin-top: 32px;
+    padding: 10px 30px;
+
+    border-top: 0.5px solid var(--mat-sys-outline);
+    border-bottom: 0.5px solid var(--mat-sys-outline);
+    
+    h4 {
+        margin-bottom: 0;
+        margin-top: 12px;
+        font-weight: 500;
+        opacity: 0.8;
+    }
+
+    @media (max-width: 900px) {
+        padding: 4px 8px;
+    }
+}
+
+.comments {
+    margin-top: 30px;
+}
+
+.comment {
+    margin-top: 15px;
+    padding: 20px 30px;
+    border-radius: 16px;
+    width: 70%;
+}
+
+.comments-header {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+    margin-left: 24px;
+}
+
+.owner-comment {
+    background-color: var(--mat-sys-surface-container-high);
+}
+
+.system-comment {
+    margin-left: auto;
+    background-color: var(--mat-sys-surface-container-low);
+
+    p {
+        padding-inline: 8px;
+    }
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.8;
+
+    div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+.comment-input {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 20px 100px;
+
+    mat-form-field {
+        width: 100%;
+    }
+
+    @media (max-width: 900px) {
+        padding: 10px 20px;
+    }
+}
+
+.no-comments {
+    margin-top: 20px;
+    margin-left: 24px;
+    opacity: 0.66;
+}
+
+.ticket-closed-info {
+    background-color: var(--mat-sys-surface-container-low);
+    padding: 16px;
+    box-sizing: border-box;
+    margin-top: 30px;
+    margin-inline: 32px;
+    border-radius: 16px;
+    
+    div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        mat-icon {
+            width: 40px;
+            height: auto;
+        }
+
+        @media (max-width: 800px) {
+            font-size: 0.75rem;
+        }
+    }
+
+    @media (max-width: 1150px) {
+        margin-inline: 5px;
+    }
+}
+
+.attachments {
+    padding: 10px 30px 24px 30px;
+    border-bottom: 0.5px solid var(--mat-sys-outline);
+
+    h4 {
+        margin-bottom: 10px;
+        margin-top: 12px;
+        font-weight: 500;
+        opacity: 0.8;
+    }
+
+    @media (max-width: 900px) {
+        padding: 4px 8px;
+    }
+}
+
+.upload-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    @media (max-width: 600px) {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.selected-file {
+    margin-top: 8px;
+    opacity: 0.8;
+    word-break: break-word;
+}
+
+.attachments-list {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background-color: var(--mat-sys-surface-container);
+    padding: 5px 5px 5px 18px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+
+    @media (max-width: 600px) {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+
+    mat-icon {
+        font-size: 1.2rem;
+    }
+
+    button {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+.attachment-link {
+    color: var(--mat-sys-primary);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.attachment-link:hover {
+    opacity: 0.85;
+}
+
+.attachment-suggest {
+    position: fixed;
+    z-index: 1000;
+    width: fit-content;
+    overflow: auto;
+    background-color: var(--mat-sys-surface-container-highest);
+    border: 0.5px solid var(--mat-sys-outline);
+    border-radius: 12px;
+    padding: 6px;
+}
+
+.attachment-suggest-item {
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    word-break: break-word;
+}
+
+.attachment-suggest-item:last-child {
+    margin-bottom: 0;
+}
+
+.attachment-suggest-empty {
+    padding: 10px;
+    opacity: 0.7;
+    font-size: 0.9rem;
+}
+
+.attachment-link {
+    background-color: var(--mat-sys-secondary);
+    color: var(--mat-sys-on-secondary);
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.attachment-deleted {
+    background-color: var(--mat-sys-error);
+    color: var(--mat-sys-on-error);
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
