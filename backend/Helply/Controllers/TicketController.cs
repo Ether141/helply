@@ -163,6 +163,7 @@ public class TicketController : ControllerBase
             return Forbid();
 
         var comments = await _db.TicketComments
+            .Include(c => c.Author)
             .Where(c => c.TicketId == id)
             .OrderBy(c => c.CreatedAt)
             .Select(c => new TicketCommentResponse
