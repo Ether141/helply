@@ -44,7 +44,6 @@ public class TicketController : ControllerBase
         var ticket = new Ticket
         {
             Id = Guid.NewGuid(),
-            Slug = _db.Tickets.AsNoTracking().Count(),
             Title = request.Title.Trim(),
             Description = request.Description.Trim(),
             Status = TicketStatus.Open,

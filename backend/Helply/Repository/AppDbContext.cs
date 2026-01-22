@@ -14,4 +14,17 @@ public class AppDbContext : DbContext
     public DbSet<Attachment> Attachments { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Ticket>(entity =>
+        {
+            entity.HasIndex(t => t.Slug).IsUnique();
+
+            entity.Property(t => t.Slug)
+                .UseIdentityAlwaysColumn();
+        });
+    }
 }
