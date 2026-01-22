@@ -15,7 +15,13 @@ public sealed class TicketCommentAddedConsumer : IConsumer<TicketCommentAdded>
 
         _logger.LogInformation("ticket_comment_added: {TicketId} at {At}", m.TicketId, m.AddedAt);
 
-        context.Publish(new TicketNotification()
+        if (m.UserId == m.AuthorId)
+        {
+            _logger.LogInformation("Skipping notification for author (UserId == AuthorId == {UserId})", m.UserId);
+            return Task.CompletedTask;
+        }
+
+        context.Publish(new TicketNotification
         {
             NotificationId = Guid.NewGuid(),
             UserId = m.UserId,

@@ -160,7 +160,8 @@ public class TicketController : ControllerBase
         {
             TicketId = ticket.Id,
             AddedAt = DateTime.UtcNow,
-            UserId = ticket.UserId
+            UserId = ticket.UserId,
+            AuthorId = userId
         });
 
         return Ok();
