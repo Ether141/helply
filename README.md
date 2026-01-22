@@ -135,3 +135,6 @@ Click any thumbnail to open the full image.
 	<a href="./screenshots/ticket_dark_mobile.png"><img src="./screenshots/ticket_dark_mobile.png" width="260" /></a>
 </p>
 
+## ERD Diagram
+
+<a href="./screenshots/erd.png"><img src="./screenshots/erd.png" /></a>
