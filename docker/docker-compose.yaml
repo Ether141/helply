@@ -103,7 +103,7 @@ services:
 
   seq:
     image: datalust/seq:latest
-    container_name: seq
+    container_name: helply-seq
     profiles:
       - dev
     environment:
