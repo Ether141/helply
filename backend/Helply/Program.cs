@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
@@ -32,7 +33,15 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+        builder.Services.AddOptions<JwtOptions>()
+            .Bind(builder.Configuration.GetSection("Jwt"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        builder.Services.AddOptions<RabbitMqTransportOptions>()
+            .BindConfiguration(nameof(RabbitMqTransportOptions))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
         builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
@@ -58,7 +67,6 @@ public class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
-            app.MapOpenApi();
         }
 
         app.UseCors("spa");
@@ -74,7 +82,7 @@ public class Program
 
     private static void ConfigureJWT(WebApplicationBuilder builder)
     {
-        var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
+        var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() ?? throw new ValidationException("Missing Jwt configuration section.");
 
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -172,11 +180,16 @@ public class Program
     private static void UseSerilog(WebApplicationBuilder builder)
     {
         builder.Host.UseSerilog((context, services, loggerConfiguration) =>
+        {
             loggerConfiguration
                 .ReadFrom.Configuration(context.Configuration)
                 .ReadFrom.Services(services)
                 .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.Seq(context.Configuration["Serilog:SeqUrl"]!));
+                .WriteTo.Console();
+
+            var seqUrl = context.Configuration["Serilog:SeqUrl"];
+            if (!string.IsNullOrWhiteSpace(seqUrl))
+                loggerConfiguration.WriteTo.Seq(seqUrl);
+        });
     }
 }
