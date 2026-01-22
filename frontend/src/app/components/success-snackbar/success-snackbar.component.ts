@@ -12,7 +12,7 @@ export interface SuccessSnackbarData {
   standalone: true,
   imports: [MatIconModule],
   template: `
-    <div class="snackbar" role="status" aria-live="polite">
+    <div class="snackbar">
       <span class="message">{{ data.message }}</span>
       <mat-icon class="icon">{{ data.icon ?? 'check_circle' }}</mat-icon>
     </div>
@@ -51,13 +51,20 @@ export class SuccessSnackbarComponent {
       panelClass?: string | string[];
     }
   ): MatSnackBarRef<SuccessSnackbarComponent> {
-    return snackBar.openFromComponent(SuccessSnackbarComponent, {
+    // Angular Material uses CDK LiveAnnouncer for accessibility announcements.
+    // In this app it can throw `HierarchyRequestError` during announcement.
+    // Disable announcements for this snackbar to avoid runtime errors.
+    const config: any = {
       duration: options?.duration ?? 5000,
       data: {
         message,
         icon: options?.icon ?? 'check_circle'
       },
-      panelClass: options?.panelClass ?? ['snackbar-success']
-    });
+      panelClass: options?.panelClass ?? ['snackbar-success'],
+      announcementMessage: '',
+      politeness: 'off'
+    };
+
+    return snackBar.openFromComponent(SuccessSnackbarComponent, config);
   }
 }
