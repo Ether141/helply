@@ -124,14 +124,14 @@ The following users are included in `docker/db.sql`. All accounts use the same p
 Click any thumbnail to open the full image.
 
 <p>
-	<a href="../screenshots/dashboard.png"><img src="../screenshots/dashboard.png" width="260" /></a>
-	<a href="../screenshots/tickets.png"><img src="../screenshots/tickets.png" width="260" /></a>
-	<a href="../screenshots/ticket.png"><img src="../screenshots/ticket.png" width="260" /></a>
+	<a href="./screenshots/dashboard.png"><img src="./screenshots/dashboard.png" width="260" /></a>
+	<a href="./screenshots/tickets.png"><img src="./screenshots/tickets.png" width="260" /></a>
+	<a href="./screenshots/ticket.png"><img src="./screenshots/ticket.png" width="260" /></a>
 </p>
 
 <p>
-	<a href="../screenshots/dashboard_dark.png"><img src="../screenshots/dashboard_dark.png" width="260" /></a>
-	<a href="../screenshots/dashboard_mobile.png"><img src="../screenshots/dashboard_mobile.png" width="260" /></a>
-	<a href="../screenshots/ticket_dark_mobile.png"><img src="../screenshots/ticket_dark_mobile.png" width="260" /></a>
+	<a href="./screenshots/dashboard_dark.png"><img src="./screenshots/dashboard_dark.png" width="260" /></a>
+	<a href="./screenshots/dashboard_mobile.png"><img src="./screenshots/dashboard_mobile.png" width="260" /></a>
+	<a href="./screenshots/ticket_dark_mobile.png"><img src="./screenshots/ticket_dark_mobile.png" width="260" /></a>
 </p>
 
