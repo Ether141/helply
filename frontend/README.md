@@ -1,98 +1,137 @@
+
 # Helply
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.6.
+Helply is a lightweight helpdesk/ticketing application.
 
-## Development server
+It consists of:
 
-To start a local development server, run:
+- Angular SPA (frontend)
+- ASP.NET Core Web API (backend)
+- Background worker (MassTransit + RabbitMQ consumers)
+- PostgreSQL database
+- RabbitMQ (message broker)
+- Optional dev tooling: pgAdmin + Seq
 
-```bash
-ng serve
-```
+## Key features
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Email + password authentication (JWT access tokens + refresh tokens)
+- Role-based access: `User` and `Assistant`
+- Ticket management: create, view, update, assign, change status/priority
+- Ticket categories
+- Comments on tickets
+- File attachments for tickets
+- Notifications delivered via SignalR and messaging events
 
-## Code scaffolding
+## Running the full stack (Docker Compose)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Prerequisites:
 
-```bash
-ng generate component component-name
-```
+- Docker Desktop (Windows/macOS) or Docker Engine (Linux)
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+All compose files live in the `docker/` folder, so run commands from there.
 
-```bash
-ng generate --help
-```
+### Start core services
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+This starts the core stack (Postgres, RabbitMQ, backend, worker, frontend):
 
 ```bash
-ng test
+cd docker
+docker compose up -d --build
 ```
 
-## Running end-to-end tests
+### Start with the `dev` profile (pgAdmin + Seq)
 
-For end-to-end (e2e) testing, run:
+The `dev` profile enables additional dev-only services:
+
+- `pgadmin` (PostgreSQL UI)
+- `seq` (log viewer)
 
 ```bash
-ng e2e
+cd docker
+docker compose --profile dev up -d --build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Useful URLs / ports
 
-## Additional Resources
+- Frontend: http://localhost:4200
+- Backend API: http://localhost:5202
+- RabbitMQ management UI: http://localhost:15672 (user: `rabbitmq`, password: `rabbitmq`)
+- PostgreSQL: `localhost:5432` (db: `appdb`, user: `appuser`, password: `apppassword`)
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Dev profile only:
 
-## REST API (backend)
+- pgAdmin: http://localhost:5050 (email: `admin@admin.com`, password: `admin`)
+- Seq: http://localhost:8081
 
-Projekt ma przygotowaną warstwę do pracy z REST API:
+### Stop the stack
 
-- Konfiguracja base URL: [src/environments/environment.ts](src/environments/environment.ts) (`apiBaseUrl`)
-- Klient HTTP: [src/app/core/api/api-client.service.ts](src/app/core/api/api-client.service.ts) (`ApiClient`)
-- Interceptory: [src/app/core/api/api.interceptors.ts](src/app/core/api/api.interceptors.ts)
-
-### Konfiguracja
-
-Domyślnie `apiBaseUrl` jest ustawione na `'/api'` (względny adres), co dobrze współgra z reverse-proxy/proxy.
-
-Build produkcyjny automatycznie podmienia environment na [src/environments/environment.production.ts](src/environments/environment.production.ts).
-
-### Użycie
-
-Przykład wywołania:
-
-```ts
-import { Component, inject } from '@angular/core';
-import { ApiClient } from './core/api/api-client.service';
-import { ApiError } from './core/api/api-error';
-
-@Component({
-	selector: 'app-example',
-	template: ''
-})
-export class ExampleComponent {
-	private readonly api = inject(ApiClient);
-
-	load(): void {
-		this.api.get<{ id: string; title: string }[]>('/tickets').subscribe({
-			next: (tickets) => console.log(tickets),
-			error: (err: ApiError) => console.error(err.message, err.status)
-		});
-	}
-}
+```bash
+cd docker
+docker compose down
 ```
+
+To also remove the database data volume (fresh DB next time):
+
+```bash
+cd docker
+docker compose down -v
+```
+
+## Database seeding (`db.sql`) using the `seed` profile
+
+The repository includes a seed script at `docker/db.sql`. The compose service `db-seed` runs `psql` inside a Postgres image and imports that file into the running `postgres` service.
+
+Important: the seed file uses `COPY` into existing tables. The backend applies EF Core migrations automatically on startup, so make sure the backend has started at least once before seeding.
+
+### Seed on a fresh database (recommended)
+
+```bash
+cd docker
+
+# 1) Reset everything (removes volumes)
+docker compose down -v
+
+# 2) Start the core stack so migrations run
+docker compose up -d --build
+
+# 3) Import seed data (profile: seed)
+docker compose --profile seed run --rm db-seed
+```
+
+If you want to see the output and have the command exit with the container status, you can also use:
+
+```bash
+cd docker
+docker compose --profile seed up --abort-on-container-exit db-seed
+```
+
+Note: re-running the seed on a non-empty database may fail due to duplicate primary keys.
+
+## Default accounts
+
+The following users are included in `docker/db.sql`. All accounts use the same password:
+
+- Password: `Password123`
+
+| Email | Name | Role |
+|---|---|---|
+| piotrnowak@gmail.com | Piotr Nowak | User |
+| jankowalski@gmail.com | Jan Kowalski | Assistant |
+| monikalewandowska@gmail.com | Monika Lewandowska | Assistant |
+
+## Screenshots
+
+Click any thumbnail to open the full image.
+
+<p>
+	<a href="../screenshots/dashboard.png"><img src="../screenshots/dashboard.png" width="260" /></a>
+	<a href="../screenshots/tickets.png"><img src="../screenshots/tickets.png" width="260" /></a>
+	<a href="../screenshots/ticket.png"><img src="../screenshots/ticket.png" width="260" /></a>
+</p>
+
+<p>
+	<a href="../screenshots/dashboard_dark.png"><img src="../screenshots/dashboard_dark.png" width="260" /></a>
+	<a href="../screenshots/dashboard_mobile.png"><img src="../screenshots/dashboard_mobile.png" width="260" /></a>
+	<a href="../screenshots/ticket_dark_mobile.png"><img src="../screenshots/ticket_dark_mobile.png" width="260" /></a>
+</p>
+
