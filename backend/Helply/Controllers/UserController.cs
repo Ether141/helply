@@ -59,8 +59,6 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(object), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request)
     {
-        await Task.Delay(1000);
-
         if (!ModelState.IsValid)
             return ValidationProblem(ModelState);
 
@@ -98,8 +96,6 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
-        await Task.Delay(500);
-
         if (!ModelState.IsValid)
             return ValidationProblem(ModelState);
 
