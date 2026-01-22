@@ -10,6 +10,7 @@ namespace Helply.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class NotificationController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -21,6 +22,8 @@ public class NotificationController : ControllerBase
 
     [Authorize]
     [HttpGet("all")]
+    [ProducesResponseType(typeof(IEnumerable<NotificationResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IEnumerable<NotificationResponse>>> GetAll()
     {
         var notifications = _db.Notifications
@@ -41,6 +44,10 @@ public class NotificationController : ControllerBase
 
     [Authorize]
     [HttpPost("read/{notificationId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> MarkAsRead(string notificationId)
     {
         if (!Guid.TryParse(notificationId, out var id))

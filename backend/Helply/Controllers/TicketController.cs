@@ -12,6 +12,7 @@ namespace Helply.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class TicketController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -25,6 +26,10 @@ public class TicketController : ControllerBase
 
     [Authorize]
     [HttpPost("create")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(TicketResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<TicketResponse>> Create([FromBody] CreateTicketRequest request)
     {
         if (!ModelState.IsValid)
@@ -61,6 +66,8 @@ public class TicketController : ControllerBase
 
     [Authorize]
     [HttpGet("my")]
+    [ProducesResponseType(typeof(IEnumerable<TicketResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IEnumerable<TicketResponse>>> ListMy()
     {
         var userId = User.GetUserId();
@@ -77,6 +84,9 @@ public class TicketController : ControllerBase
 
     [Authorize(Roles = "Assistant")]
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<TicketResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<IEnumerable<TicketResponse>>> ListAll()
     {
         var tickets = await _db.Tickets
@@ -91,6 +101,10 @@ public class TicketController : ControllerBase
 
     [Authorize]
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(TicketResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TicketResponse>> Get(Guid id)
     {
         var ticket = await _db.Tickets.Include(t => t.Category).Include(t => t.User).Include(t => t.Assistant).FirstOrDefaultAsync(t => t.Id == id);
@@ -109,6 +123,12 @@ public class TicketController : ControllerBase
 
     [Authorize]
     [HttpPost("{id}/comments")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> AddComment(Guid id, [FromBody] AddCommentRequest request)
     {
         if (!ModelState.IsValid)
@@ -149,6 +169,10 @@ public class TicketController : ControllerBase
 
     [Authorize]
     [HttpGet("{id}/comments")]
+    [ProducesResponseType(typeof(IEnumerable<TicketCommentResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<TicketCommentResponse>>> ListComments(Guid id)
     {
         var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
@@ -179,6 +203,10 @@ public class TicketController : ControllerBase
 
     [Authorize(Roles = "Assistant")]
     [HttpPost("{id}/assign")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Assign(Guid id)
     {
         var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
@@ -195,6 +223,10 @@ public class TicketController : ControllerBase
 
     [Authorize(Roles = "Assistant")]
     [HttpPost("{id}/status/{status}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> ChangeStatus(Guid id, TicketStatus status)
     {
         var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
@@ -221,6 +253,10 @@ public class TicketController : ControllerBase
 
     [Authorize(Roles = "Assistant")]
     [HttpPost("{id}/priority/{priority}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> ChangePriority(Guid id, Priority priority)
     {
         var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == id);
@@ -237,6 +273,8 @@ public class TicketController : ControllerBase
 
     [Authorize]
     [HttpGet("categories")]
+    [ProducesResponseType(typeof(IEnumerable<CategoryDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IEnumerable<CategoryDTO>>> ListCategories()
     {
         var categories = await _db.TicketCategories
@@ -254,6 +292,8 @@ public class TicketController : ControllerBase
 
     [Authorize]
     [HttpGet("summary")]
+    [ProducesResponseType(typeof(TicketSummaryResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<TicketSummaryResponse>> GetSummary()
     {
         var query = _db.Tickets.AsNoTracking();

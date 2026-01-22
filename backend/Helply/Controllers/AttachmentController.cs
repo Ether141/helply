@@ -12,6 +12,7 @@ namespace Helply.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 [ApiController]
+[Produces("application/json")]
 public class AttachmentController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -26,6 +27,8 @@ public class AttachmentController : ControllerBase
     }
 
     [HttpGet("download/{attachmentId}")]
+    [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DownloadAttachment(Guid attachmentId)
     {
         Attachment? attachment = await _db.Attachments.FirstOrDefaultAsync(a => a.Id == attachmentId);
@@ -46,6 +49,8 @@ public class AttachmentController : ControllerBase
     }
 
     [HttpGet("list/{ticketId}")]
+    [ProducesResponseType(typeof(IEnumerable<AttachmentResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<AttachmentResponse>>> ListAllForTicket(Guid ticketId)
     {
         Ticket? ticket = await _db.Tickets.AsNoTracking().FirstOrDefaultAsync(t => t.Id == ticketId);
@@ -61,6 +66,11 @@ public class AttachmentController : ControllerBase
 
     [HttpPost("upload/{ticketId}")]
     [RequestSizeLimit(10 * 1024 * 1024)]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Upload(Guid ticketId, IFormFile file)
     {
         if (file == null || file.Length == 0)
@@ -109,6 +119,8 @@ public class AttachmentController : ControllerBase
     }
 
     [HttpDelete("{attachmentId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAttachment(Guid attachmentId)
     {
         Attachment? attachment = await _db.Attachments.FirstOrDefaultAsync(a => a.Id == attachmentId);

@@ -12,6 +12,7 @@ namespace Helply.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class UserController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -31,6 +32,8 @@ public class UserController : ControllerBase
 
     [Authorize]
     [HttpGet("me")]
+    [ProducesResponseType(typeof(UserInfoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<object>> Me()
     {
         var user = await _db.Users
@@ -50,6 +53,10 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("register")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request)
     {
         await Task.Delay(1000);
@@ -85,6 +92,10 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("login")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
         await Task.Delay(500);
@@ -113,6 +124,10 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("refresh")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthResponse>> Refresh([FromBody] RefreshRequest request)
     {
         if (!ModelState.IsValid)
