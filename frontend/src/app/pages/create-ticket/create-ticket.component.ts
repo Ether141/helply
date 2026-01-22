@@ -1,9 +1,11 @@
 import { Component, DestroyRef, inject } from "@angular/core";
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from "@angular/forms";
+import { Router } from "@angular/router";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { MatButtonModule } from "@angular/material/button";
+import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { of } from "rxjs";
 import { catchError } from "rxjs/operators";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -23,6 +25,10 @@ interface CreateTicketRequest {
   priority: number;
 }
 
+interface CreateTicketResponse {
+  id: string;
+}
+
 @Component({
   selector: 'app-create-ticket',
   standalone: true,
@@ -34,11 +40,14 @@ interface CreateTicketRequest {
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
+    MatSnackBarModule,
   ]
 })
 export class CreateTicketComponent {
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(ApiClient);
+  private readonly router = inject(Router);
+  private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
 
   categories: TicketCategoryDto[] = [];
@@ -55,7 +64,7 @@ export class CreateTicketComponent {
       .get<TicketCategoryDto[]>("ticket/categories")
       .pipe(
         catchError((err) => {
-          console.error("Failed to load ticket categories:", err);
+          this.snackBar.open("Nie udało się pobrać kategorii zgłoszeń", "OK", { duration: 3500 });
           return of([] as TicketCategoryDto[]);
         }),
         takeUntilDestroyed(this.destroyRef)
@@ -84,19 +93,19 @@ export class CreateTicketComponent {
     };
 
     this.api
-      .post<void>("ticket/create", payload)
+      .post<CreateTicketResponse>("ticket/create", payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
-          this.ticketForm.reset({
-            title: "",
-            category: "",
-            priority: 1,
-            description: "",
-          });
+        next: (created) => {
+          if (created?.id) {
+            this.router.navigate(["/ticket", created.id]);
+            return;
+          }
+
+          this.snackBar.open("Zgłoszenie utworzone, ale brak ID w odpowiedzi", "OK", { duration: 3500 });
         },
         error: (err) => {
-          console.error("Failed to create ticket:", err);
+          this.snackBar.open("Nie udało się utworzyć zgłoszenia", "OK", { duration: 3500 });
         },
       });
   }
