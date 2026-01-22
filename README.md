@@ -21,6 +21,14 @@ It consists of:
 - File attachments for tickets
 - Notifications delivered via SignalR and messaging events
 
+## Technologies
+
+- ASP.NET 10
+- Angular + TypeScript
+- PostgreSQL
+- Docker
+- RabbitMQ
+
 ## Running the full stack (Docker Compose)
 
 Prerequisites:
