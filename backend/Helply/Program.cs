@@ -135,8 +135,6 @@ public class Program
 
     private static void ConfigureRabbitMq(WebApplicationBuilder builder)
     {
-        builder.Services.AddOptions<RabbitMqTransportOptions>().BindConfiguration(nameof(RabbitMqTransportOptions));
-
         builder.Services.AddMassTransit(x =>
         {
             x.AddConsumers(typeof(Program).Assembly);
