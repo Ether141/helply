@@ -40,6 +40,40 @@ public class Program
         builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
         builder.Services.AddSingleton<IFileManager, FileManager>();
 
+        ConfigureJWT(builder);
+
+        builder.Services.AddSignalR(o =>
+        {
+            o.KeepAliveInterval = TimeSpan.FromSeconds(15);
+            o.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+        });
+
+        ConfigureRabbitMq(builder);
+        UseSerilog(builder);
+        AddCorsPolicy(builder);
+
+        var app = builder.Build();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            app.MapOpenApi();
+        }
+
+        app.UseCors("spa");
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapControllers();
+        app.MapHub<NotificationsHub>("/hubs/notifications");
+
+        app.Run();
+    }
+
+    private static void ConfigureJWT(WebApplicationBuilder builder)
+    {
         var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
 
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -83,13 +117,10 @@ public class Program
             });
 
         builder.Services.AddAuthorization();
+    }
 
-        builder.Services.AddSignalR(o =>
-        {
-            o.KeepAliveInterval = TimeSpan.FromSeconds(15);
-            o.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
-        });
-
+    private static void ConfigureRabbitMq(WebApplicationBuilder builder)
+    {
         builder.Services.AddOptions<RabbitMqTransportOptions>().BindConfiguration(nameof(RabbitMqTransportOptions));
 
         builder.Services.AddMassTransit(x =>
@@ -118,15 +149,10 @@ public class Program
                 });
             });
         });
+    }
 
-        builder.Host.UseSerilog((context, services, loggerConfiguration) =>
-            loggerConfiguration
-                .ReadFrom.Configuration(context.Configuration)
-                .ReadFrom.Services(services)
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.Seq(context.Configuration["Serilog:SeqUrl"]!));
-
+    private static void AddCorsPolicy(WebApplicationBuilder builder)
+    {
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("spa", policy =>
@@ -141,24 +167,16 @@ public class Program
                       .AllowCredentials();
             });
         });
+    }
 
-        var app = builder.Build();
-
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-            app.MapOpenApi();
-        }
-
-        app.UseCors("spa");
-
-        app.UseAuthentication();
-        app.UseAuthorization();
-
-        app.MapControllers();
-        app.MapHub<NotificationsHub>("/hubs/notifications");
-
-        app.Run();
+    private static void UseSerilog(WebApplicationBuilder builder)
+    {
+        builder.Host.UseSerilog((context, services, loggerConfiguration) =>
+            loggerConfiguration
+                .ReadFrom.Configuration(context.Configuration)
+                .ReadFrom.Services(services)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.Seq(context.Configuration["Serilog:SeqUrl"]!));
     }
 }
