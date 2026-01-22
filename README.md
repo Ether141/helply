@@ -118,6 +118,8 @@ The following users are included in `docker/db.sql`. All accounts use the same p
 | piotrnowak@gmail.com | Piotr Nowak | User |
 | jankowalski@gmail.com | Jan Kowalski | Assistant |
 | monikalewandowska@gmail.com | Monika Lewandowska | Assistant |
+| annamaj@gmail.com | Anna Maj | User
+| michalzielinski@gmail.com | Michał Zieliński | User
 
 ## Screenshots
 
