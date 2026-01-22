@@ -1,5 +1,4 @@
-
-# Helply
+<img src="frontend/src/assets/full-logo.svg" style="width: 400px;"/><br><br>
 
 Helply is a lightweight helpdesk/ticketing application.
 
