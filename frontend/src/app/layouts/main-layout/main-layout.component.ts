@@ -92,8 +92,6 @@ export class MainLayoutComponent implements OnInit {
   }
 
   private readonly onNotification: (...args: unknown[]) => void = (payload: unknown) => {
-    console.log('notification:', payload);
-
     this.fetchNotifications('signalr');
   };
 
@@ -104,7 +102,6 @@ export class MainLayoutComponent implements OnInit {
       .subscribe({
         next: notifications => {
           this.notifications = notifications;
-          console.log(`notifications (${source}):`, notifications);
           this.cdr.markForCheck();
         },
         error: err => console.error(`Failed to fetch notifications (${source}):`, err)
