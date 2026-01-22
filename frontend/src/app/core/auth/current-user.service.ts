@@ -35,7 +35,6 @@ export class CurrentUserService {
   refresh(): Observable<CurrentUser | null> {
     return this.api.get<MeResponse>('/user/me').pipe(
       map((res) => ({ firstName: res.firstName, lastName: res.lastName, email: res.email, role: res.role })),
-      tap((user) => console.log('Current user refreshed:', user)),
       tap((user) => this.subject.next(user)),
       catchError((_err: unknown) => {
         const err = _err as ApiError | undefined;
