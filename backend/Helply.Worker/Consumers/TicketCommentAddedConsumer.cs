@@ -9,7 +9,7 @@ public sealed class TicketCommentAddedConsumer : IConsumer<TicketCommentAdded>
 
     public TicketCommentAddedConsumer(ILogger<TicketCommentAddedConsumer> logger) => _logger = logger;
 
-    public Task Consume(ConsumeContext<TicketCommentAdded> context)
+    public async Task Consume(ConsumeContext<TicketCommentAdded> context)
     {
         var m = context.Message;
 
@@ -18,17 +18,15 @@ public sealed class TicketCommentAddedConsumer : IConsumer<TicketCommentAdded>
         if (m.UserId == m.AuthorId)
         {
             _logger.LogInformation("Skipping notification for author (UserId == AuthorId == {UserId})", m.UserId);
-            return Task.CompletedTask;
+            return;
         }
 
-        context.Publish(new TicketNotification
+        await context.Publish(new TicketNotification
         {
             NotificationId = Guid.NewGuid(),
             UserId = m.UserId,
             TicketId = m.TicketId,
             Type = 1
         }, context.CancellationToken);
-
-        return Task.CompletedTask;
     }
 }
