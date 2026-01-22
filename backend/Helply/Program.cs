@@ -119,20 +119,24 @@ public class Program
             });
         });
 
-        Log.Logger = new LoggerConfiguration()
-            .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .WriteTo.Seq(builder.Configuration["Serilog:SeqUrl"]!)
-            .CreateLogger();
-
-        builder.Services.AddSerilog();
+        builder.Host.UseSerilog((context, services, loggerConfiguration) =>
+            loggerConfiguration
+                .ReadFrom.Configuration(context.Configuration)
+                .ReadFrom.Services(services)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.Seq(context.Configuration["Serilog:SeqUrl"]!));
 
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("spa", policy =>
             {
-                policy.WithOrigins("http://localhost:4200")
-                      .AllowAnyHeader()
+                var origins = builder.Configuration.GetSection("Cors:Policies:spa:Origins").Get<string[]>() ?? [];
+
+                if (origins.Length > 0)
+                    policy.WithOrigins(origins);
+
+                policy.AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
             });
@@ -144,6 +148,7 @@ public class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
+            app.MapOpenApi();
         }
 
         app.UseCors("spa");
