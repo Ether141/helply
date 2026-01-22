@@ -209,14 +209,15 @@ export class TicketComponent {
     const coords = this.getCaretClientCoordinates(textarea, caret);
     const panelWidth = 280;
     const panelMaxHeight = 220;
+    const verticalOffset = 60;
 
     let left = coords.left;
-    let top = coords.top + coords.height;
+    let top = coords.top + coords.height - verticalOffset;
 
     const maxLeft = Math.max(8, window.innerWidth - panelWidth - 8);
     const maxTop = Math.max(8, window.innerHeight - panelMaxHeight - 8);
     left = Math.min(Math.max(8, left), maxLeft);
-    top = Math.min(Math.max(8, top), maxTop) - 42;
+    top = Math.min(Math.max(8, top), maxTop);
 
     this.attachmentSuggestLeft = left;
     this.attachmentSuggestTop = top;
