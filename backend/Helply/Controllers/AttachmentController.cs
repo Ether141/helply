@@ -61,7 +61,7 @@ public class AttachmentController : ControllerBase
 
     [HttpPost("upload/{ticketId}")]
     [RequestSizeLimit(10 * 1024 * 1024)]
-    public async Task<ActionResult> Upload(Guid ticketId, [FromForm] IFormFile file)
+    public async Task<ActionResult> Upload(Guid ticketId, IFormFile file)
     {
         if (file == null || file.Length == 0)
         {
